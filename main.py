@@ -60,21 +60,49 @@ def _maybe_parse_date(s):
 def _auto_map_columns(df: pd.DataFrame):
     columns_lower = {c.lower(): c for c in df.columns}
 
-    # helpers
     def pick(candidates):
         for name in candidates:
             if name in columns_lower:
                 return columns_lower[name]
         return None
 
-    lat_col = pick(["latitude", "lat", "y"])
-    lng_col = pick(["longitude", "lon", "lng", "x"])
-    date_col = pick(["date", "datetime", "occurred_on", "timestamp", "reported_date", "reported_at"])
-    cat_col = pick(["category", "offense", "crime_type", "offense_type", "type", "ucr", "incident_type"])
-    desc_col = pick(["description", "details", "summary", "narrative", "offense_description", "incident_description"])
-    id_col = pick(["id", "incident_id", "case_number", "case_id", "event_number"])
-    city_col = pick(["city", "municipality", "jurisdiction"])
-    state_col = pick(["state", "province", "region"])
+    # ➜ Add your actual CSV header names here
+    lat_col = pick([
+        "incident_latitude",  # <— your file
+        "latitude", "lat", "y"
+    ])
+    lng_col = pick([
+        "incident_longitude",  # <— your file
+        "longitude", "lon", "lng", "x"
+    ])
+    date_col = pick([
+        "incident_date",      # <— your file
+        "date", "datetime", "occurred_on", "timestamp", "reported_date", "reported_at"
+    ])
+    cat_col = pick([
+        "incident_offense",                 # <— likely best "category"
+        "incident_offense_code",
+        "incident_source_original_type",
+        "category", "offense", "crime_type", "offense_type", "type", "ucr", "incident_type"
+    ])
+    desc_col = pick([
+        "incident_offense_description",     # <— good human-readable text
+        "incident_offense_detail_description",
+        "incident_address",
+        "description", "details", "summary", "narrative", "offense_description", "incident_description"
+    ])
+    id_col = pick([
+        "incident_code",    # <— your file’s unique-ish id
+        "id", "incident_id", "case_number", "case_id", "event_number"
+    ])
+    city_col = pick([
+        "city_key",         # <— your file; if this is a code, we can change later
+        "incident_source_name",
+        "city", "municipality", "jurisdiction"
+    ])
+    state_col = pick([
+        "state", "province", "region"      # your file may not have this; that's fine
+    ])
 
     return {
         "lat": lat_col,
